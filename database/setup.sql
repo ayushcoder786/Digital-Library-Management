@@ -118,7 +118,8 @@ INSERT INTO users (username, first_name, last_name, email, phone_number, address
     ('prateek',      'Prateek',    'Lohiya',     'lohiyaparteek@email.com',     '7877713818', 'Jaipur, Rajasthan',      'MEMBER',    'Member@1',   5),
     ('divyansh',    'Divyanshu',  'Goyal',      'divyanshugoyal@email.com',    '9876543211', 'Pune, Maharashtra',      'MEMBER',    'Member@1',   5),
     ('harsha',      'Harsha',     'Vardhan',    'harshavardhan@email.com',     '9876543212', 'Bengaluru, Karnataka',   'MEMBER',    'Member@1',   5),
-    ('yamini',    'Saaredy',     'Yamini',      'sareddyyamini@email.com',      '9876543213', 'Ahmedabad, Gujarat',     'MEMBER',    'Member@1',   5)
+    ('yamini',    'Saaredy',     'Yamini',      'sareddyyamini@email.com',      '9876543213', 'Ahmedabad, Gujarat',     'MEMBER',    'Member@1',   5),
+    ('chaitra',    'J.Reddy',     'Chaitra',      'chaitra@email.com',      '9876543214', 'Chennai, Tamil Nadu',     'MEMBER',    'Member@1',   5)
 ON CONFLICT (email) DO NOTHING;
 
 -- ─────────────────────────────────────────────────────────────

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dirs>
+    <entry loc="C:\Users\S. LAASYA\Desktop\Y25DBMS\sts-5.1.1.RELEASE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_25.0.2.v20260203-1141\jre" stamp="1779371832157"/>
     <entry loc="D:\Program Files\Spring Tools\sts-5.1.1.RELEASE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_25.0.2.v20260203-1141\jre" stamp="1776876726447"/>
+    <entry loc="C:\Program Files\Java\jdk-25" stamp="1764257856990"/>
+    <entry loc="C:\Users\S. LAASYA\Desktop\Y25DBMS\sts-5.1.1.RELEASE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_25.0.2.v20260203-1141" stamp="1779371833355"/>
+    <entry loc="C:\Program Files\Java\jre1.8.0_461" stamp="1754729707036"/>
     <entry loc="D:\Program Files\Spring Tools\sts-5.1.1.RELEASE\plugins\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_25.0.2.v20260203-1141" stamp="1776876729562"/>
     <entry loc="C:\Program Files\Java\jdk-25.0.3" stamp="1776876647346"/>
 </dirs>

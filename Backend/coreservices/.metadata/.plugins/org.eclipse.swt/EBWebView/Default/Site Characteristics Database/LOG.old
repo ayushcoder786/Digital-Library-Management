@@ -1,3 +1,5 @@
-2026/05/19-08:12:32.096 1de8 Reusing MANIFEST C:\Users\Ayush\Desktop\Digital Library Management\Backend\coreservices\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/MANIFEST-000001
-2026/05/19-08:12:32.099 1de8 Recovering log #3
-2026/05/19-08:12:32.100 1de8 Reusing old log C:\Users\Ayush\Desktop\Digital Library Management\Backend\coreservices\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/000003.log 
+2026/05/23-14:17:49.372 5318 Log #3: 1 ops saved to Table #4 OK
+2026/05/23-14:17:49.376 5318 Archiving C:\Users\S. LAASYA\Desktop\Digital Library management\Digital-Library-Management\Backend\coreservices\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/000003.log: OK
+2026/05/23-14:17:49.376 5318 Table #4: 1 entries OK
+2026/05/23-14:17:49.378 5318 Archiving C:\Users\S. LAASYA\Desktop\Digital Library management\Digital-Library-Management\Backend\coreservices\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database/MANIFEST-000001: OK
+2026/05/23-14:17:49.386 5318 **** Repaired leveldb C:\Users\S. LAASYA\Desktop\Digital Library management\Digital-Library-Management\Backend\coreservices\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Site Characteristics Database; recovered 1 files; 130 bytes. Some data may have been lost. ****
