@@ -105,24 +105,7 @@ export default function AuthPage() {
               </div>
             </div>
           </div>
-          <div className="brand-demo-hint">
-            <div className="demo-title">Demo Accounts</div>
-            <div className="demo-accounts">
-              <div className="demo-account">
-                <span className="demo-role admin">ADMIN</span>
-                <code>admin</code>
-              </div>
-              <div className="demo-account">
-                <span className="demo-role librarian">LIBRARIAN</span>
-                <code>librarian1</code>
-              </div>
-              <div className="demo-account">
-                <span className="demo-role member">MEMBER</span>
-                <code>john_doe</code>
-              </div>
-            </div>
-            <div className="demo-note">Use any password to log in</div>
-          </div>
+
         </div>
 
         {/* Right panel — form */}

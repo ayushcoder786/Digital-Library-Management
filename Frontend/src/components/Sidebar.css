@@ -15,7 +15,7 @@
   padding: 0;
   z-index: 100;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sidebar.collapsed {
@@ -70,7 +70,7 @@
 /* ── Collapse Button ── */
 .sidebar-collapse-btn {
   position: absolute;
-  top: 20px;
+  top: 22px;
   right: -14px;
   width: 28px;
   height: 28px;
@@ -85,6 +85,7 @@
   font-size: 13px;
   transition: var(--transition);
   z-index: 101;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
 }
 
 .sidebar-collapse-btn:hover {

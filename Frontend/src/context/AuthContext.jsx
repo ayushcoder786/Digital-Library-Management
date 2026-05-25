@@ -6,13 +6,14 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Rehydrate from localStorage on mount
+  // Rehydrate from sessionStorage on mount
+  // sessionStorage is cleared automatically when the tab/browser is closed
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('digilib_user');
+      const stored = sessionStorage.getItem('digilib_user');
       if (stored) setUser(JSON.parse(stored));
     } catch {
-      localStorage.removeItem('digilib_user');
+      sessionStorage.removeItem('digilib_user');
     } finally {
       setLoading(false);
     }
@@ -20,12 +21,12 @@ export function AuthProvider({ children }) {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('digilib_user', JSON.stringify(userData));
+    sessionStorage.setItem('digilib_user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('digilib_user');
+    sessionStorage.removeItem('digilib_user');
   };
 
   const isAdmin     = () => user?.role === 'ADMIN';
