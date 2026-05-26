@@ -73,7 +73,8 @@ Thumbs.db
 # ─────────────────────────────────────────────
 # Sensitive / local config (never commit!)
 # ─────────────────────────────────────────────
-**/application.properties
+# application.properties is tracked so contributors can run the project.
+# Put secrets/local overrides in application-local.properties (kept private).
 **/application-local.properties
 **/.env
 **/.env.local
