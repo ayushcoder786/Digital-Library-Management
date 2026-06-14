@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
-import { bookAPI, categoryAPI } from '../services/api';
+import { bookAPI, categoryAPI, searchAPI } from '../services/api';
 
 export default function Books() {
   const [books, setBooks]           = useState([]);
@@ -13,7 +13,7 @@ export default function Books() {
   const [form, setForm]             = useState({
     title: '', author: '', isbn: '', description: '',
     publisher: '', totalCopies: 1, availableCopies: 1,
-    language: 'English', pageCount: '', category: { id: '' }
+    language: 'English', pageCount: '', category: { id: '' }, tags: ''
   });
 
   useEffect(() => { fetchAll(); }, []);
@@ -37,7 +37,7 @@ export default function Books() {
   const openCreate = () => {
     setEditingBook(null);
     setForm({ title: '', author: '', isbn: '', description: '', publisher: '',
-      totalCopies: 1, availableCopies: 1, language: 'English', pageCount: '', category: { id: '' } });
+      totalCopies: 1, availableCopies: 1, language: 'English', pageCount: '', category: { id: '' }, tags: '' });
     setShowModal(true);
   };
 
@@ -48,9 +48,31 @@ export default function Books() {
       description: book.description || '', publisher: book.publisher || '',
       totalCopies: book.totalCopies, availableCopies: book.availableCopies,
       language: book.language || 'English', pageCount: book.pageCount || '',
-      category: { id: book.category?.id || '' }
+      category: { id: book.category?.id || '' },
+      tags: ''
     });
     setShowModal(true);
+  };
+
+  const syncToMongo = async (bookId, bookData) => {
+    try {
+      const tagsFromInput = bookData.tags
+        ? bookData.tags.split(',').map(t => t.trim()).filter(Boolean)
+        : [];
+      await searchAPI.saveContent({
+        bookId,
+        title:       bookData.title,
+        author:      bookData.author,
+        description: bookData.description || '',
+        tags: [
+          ...tagsFromInput,
+          bookData.language,
+          bookData.publisher,
+        ].filter(Boolean),
+      });
+    } catch {
+      // Non-blocking — don't fail the whole operation if MongoDB sync fails
+    }
   };
 
   const handleSubmit = async e => {
@@ -65,9 +87,12 @@ export default function Books() {
     try {
       if (editingBook) {
         await bookAPI.update(editingBook.id, payload);
+        await syncToMongo(editingBook.id, payload);   // sync update to MongoDB
         showToast('Book updated successfully!');
       } else {
-        await bookAPI.create(payload);
+        const res = await bookAPI.create(payload);
+        const newBookId = res.data?.id;
+        if (newBookId) await syncToMongo(newBookId, payload); // sync new book to MongoDB
         showToast('Book created successfully!');
       }
       setShowModal(false);
@@ -244,6 +269,14 @@ export default function Books() {
                   <label>Available Copies</label>
                   <input type="number" min="0" value={form.availableCopies} onChange={e => setForm({...form, availableCopies: e.target.value})} />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>Tags <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 400 }}>(comma-separated, for semantic search)</span></label>
+                <input
+                  value={form.tags}
+                  onChange={e => setForm({...form, tags: e.target.value})}
+                  placeholder="e.g. fiction, india, classic, biography"
+                />
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>

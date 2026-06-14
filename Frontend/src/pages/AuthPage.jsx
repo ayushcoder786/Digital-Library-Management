@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../services/api';
+import { authAPI, logAPI } from '../services/api';
 import './AuthPage.css';
 
 export default function AuthPage() {
@@ -32,7 +32,16 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const res = await authAPI.login(signInForm.username.trim(), signInForm.password);
-      login(res.data.user);
+      const u = res.data.user;
+      // Log LOGIN event to MongoDB (non-blocking)
+      logAPI.create({
+        userId:   u.id,
+        userName: u.username || u.firstName,
+        action:   'LOGIN',
+        entity:   'session',
+        details:  { role: u.role, method: 'sign-in' },
+      }).catch(() => {});
+      login(u);
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -54,7 +63,15 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const { password, ...payload } = signUpForm;
-      await authAPI.register({ ...payload, maxBorrowLimit: Number(payload.maxBorrowLimit) });
+      const res = await authAPI.register({ ...payload, maxBorrowLimit: Number(payload.maxBorrowLimit) });
+      // Log REGISTER event to MongoDB (non-blocking)
+      logAPI.create({
+        userId:   res.data?.user?.id ?? 0,
+        userName: signUpForm.username,
+        action:   'REGISTER',
+        entity:   'user',
+        details:  { role: signUpForm.role, email: signUpForm.email },
+      }).catch(() => {});
       setSuccess('Account created! You can now sign in with your username.');
       setMode('signin');
       setSignInForm({ username: signUpForm.username, password: '' });

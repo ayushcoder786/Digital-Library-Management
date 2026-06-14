@@ -1,0 +1,276 @@
+/* ── Activity Logs Page ───────────────────────────────────────────────────── */
+
+.al-page { padding: 0; }
+
+/* ── Tech pills (header badges) ─────────────────────────────────────────── */
+.tech-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.tech-pill.mongo { background: linear-gradient(135deg,#00ed64,#00684a); color:#fff; }
+.tech-pill.node  { background: linear-gradient(135deg,#539e43,#2d5f22); color:#fff; }
+
+/* ── Error ──────────────────────────────────────────────────────────────── */
+.al-error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: #fca5a5;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+/* ── Stats Grid ──────────────────────────────────────────────────────────── */
+.al-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+/* ── Feed header ─────────────────────────────────────────────────────────── */
+.al-feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.al-total-badge {
+  background: rgba(124,58,237,0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(124,58,237,0.3);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Feed timeline ───────────────────────────────────────────────────────── */
+.al-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.al-entry {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  animation: slideUp 0.35s ease both;
+}
+
+/* Left column: icon + connector line */
+.al-icon-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.al-action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.al-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: linear-gradient(to bottom, var(--border), transparent);
+  margin: 4px 0;
+}
+
+/* Right column: card */
+.al-card {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.al-card:hover {
+  border-color: var(--border-light);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* Top row: user + badge + time */
+.al-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* User avatar */
+.al-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.log-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.al-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.al-username {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.al-uid {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Action badge */
+.al-action-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* Time */
+.al-time {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* Mid row: human-readable description */
+.al-card-mid {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.al-action-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.al-entity {
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+}
+
+/* Detail chips (replacing raw JSON) */
+.log-detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.log-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(255,255,255,0.03);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-chip-icon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+.al-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.al-page-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.al-dot-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.al-dot-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.al-dot-btn.active {
+  background: linear-gradient(135deg, var(--accent), #5b21b6);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

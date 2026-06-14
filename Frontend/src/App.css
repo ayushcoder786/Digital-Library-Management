@@ -4,8 +4,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap');
 
-/* ── CSS Variables ─────────────────────────────────────────── */
-:root {
+/* ── CSS Variables — Dark Theme (default) ──────────────────── */
+:root,
+[data-theme="dark"] {
   --bg-dark:        #0d1117;
   --bg-card:        #161b22;
   --bg-card-hover:  #1c2333;
@@ -39,6 +40,41 @@
 
   --transition:     all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ── CSS Variables — Light Theme ───────────────────────────── */
+[data-theme="light"] {
+  --bg-dark:        #f0f4f8;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #f8fafc;
+  --bg-input:       #f1f5f9;
+  --border:         #e2e8f0;
+  --border-light:   #cbd5e1;
+
+  --accent:         #7c3aed;
+  --accent-light:   #6d28d9;
+  --accent-glow:    rgba(124, 58, 237, 0.15);
+  --accent2:        #0891b2;
+  --accent2-glow:   rgba(8, 145, 178, 0.15);
+
+  --success:        #16a34a;
+  --warning:        #d97706;
+  --danger:         #dc2626;
+  --info:           #2563eb;
+
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+
+  --shadow-sm:      0 1px 4px rgba(0,0,0,0.08);
+  --shadow-md:      0 4px 16px rgba(0,0,0,0.1);
+  --shadow-lg:      0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* ── Smooth theme transition ────────────────────────────────── */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
+}
+
 
 /* ── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

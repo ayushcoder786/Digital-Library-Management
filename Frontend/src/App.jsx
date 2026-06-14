@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Sidebar from './components/Sidebar';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
@@ -11,6 +12,8 @@ import Categories from './pages/Categories';
 import BrowseBooks from './pages/BrowseBooks';
 import MyBorrows from './pages/MyBorrows';
 import Profile from './pages/Profile';
+import SemanticSearch from './pages/SemanticSearch';
+import ActivityLogs from './pages/ActivityLogs';
 import './App.css';
 
 // Protected layout with sidebar (used after login)
@@ -42,6 +45,9 @@ function AppLayout() {
               <Route path="/users"      element={<Users />} />
               <Route path="/borrows"    element={<Borrows />} />
               <Route path="/categories" element={<Categories />} />
+              {/* MongoDB / Node.js routes – available to staff */}
+              <Route path="/search"     element={<SemanticSearch />} />
+              <Route path="/logs"       element={<ActivityLogs />} />
               <Route path="*"           element={<Navigate to="/dashboard" replace />} />
             </>
           )}
@@ -51,6 +57,8 @@ function AppLayout() {
               <Route path="/browse"     element={<BrowseBooks />} />
               <Route path="/my-borrows" element={<MyBorrows />} />
               <Route path="/profile"    element={<Profile />} />
+              {/* Semantic search is available to members too */}
+              <Route path="/search"     element={<SemanticSearch />} />
               <Route path="*"           element={<Navigate to="/browse" replace />} />
             </>
           )}
@@ -85,10 +93,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

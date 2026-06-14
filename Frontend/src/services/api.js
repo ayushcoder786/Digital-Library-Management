@@ -67,4 +67,33 @@ export const categoryAPI = {
   delete:  (id)       => API.delete(`/api/categories/${id}`),
 };
 
+/* ── Activity Logs (MongoDB / Node.js) ───────────────────── */
+export const logAPI = {
+  /** Create a log entry – call this after user actions */
+  create:      (data)             => API.post('/api/logs', data),
+  /** Admin: get paginated logs */
+  getAll:      (page = 1, size = 20) => API.get(`/api/logs?page=${page}&size=${size}`),
+  /** Dashboard: recent activity feed */
+  getRecent:   (limit = 10)       => API.get(`/api/logs/recent?limit=${limit}`),
+  /** Analytics: counts by action */
+  getStats:    ()                  => API.get('/api/logs/stats'),
+  /** Per-user history */
+  getByUser:   (userId, page = 1, size = 20) =>
+    API.get(`/api/logs/user/${userId}?page=${page}&size=${size}`),
+};
+
+/* ── Semantic / Vector Search (MongoDB / Node.js) ────────── */
+export const searchAPI = {
+  /** Natural language semantic search */
+  semantic:       (query, topK = 5) => API.get(`/api/search?q=${encodeURIComponent(query)}&topK=${topK}`),
+  /** Save book description + tags + embedding */
+  saveContent:    (data)            => API.post('/api/search/content', data),
+  /** List all books with content */
+  listContents:   (page = 1, size = 20) => API.get(`/api/search/content?page=${page}&size=${size}`),
+  /** Get content for one book */
+  getContent:     (bookId)          => API.get(`/api/search/content/${bookId}`),
+  /** Remove content when book deleted */
+  deleteContent:  (bookId)          => API.delete(`/api/search/content/${bookId}`),
+};
+
 export default API;

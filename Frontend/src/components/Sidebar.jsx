@@ -2,9 +2,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiBookOpen, FiUsers, FiRepeat,
   FiTag, FiBook, FiClock, FiUser,
-  FiLogOut, FiChevronLeft, FiChevronRight, FiBookmark
+  FiLogOut, FiChevronLeft, FiChevronRight, FiBookmark,
+  FiSearch, FiActivity, FiSun, FiMoon
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useState } from 'react';
 import './Sidebar.css';
 
@@ -15,6 +17,9 @@ const ADMIN_MENU = [
   { to: '/users',       icon: <FiUsers />,    label: 'Users',         badge: null },
   { to: '/borrows',     icon: <FiRepeat />,   label: 'Borrows',       badge: null },
   { to: '/categories',  icon: <FiTag />,      label: 'Categories',    badge: null },
+  // ── MongoDB / Node.js features ──────────────────────────────────────────
+  { to: '/search',      icon: <FiSearch />,   label: 'Semantic Search', badge: 'AI' },
+  { to: '/logs',        icon: <FiActivity />, label: 'Activity Logs', badge: null },
 ];
 
 const LIBRARIAN_MENU = [
@@ -23,12 +28,16 @@ const LIBRARIAN_MENU = [
   { to: '/users',       icon: <FiUsers />,    label: 'Members',       badge: null },
   { to: '/borrows',     icon: <FiRepeat />,   label: 'Borrows',       badge: null },
   { to: '/categories',  icon: <FiTag />,      label: 'Categories',    badge: null },
+  // ── MongoDB / Node.js features ──────────────────────────────────────────
+  { to: '/search',      icon: <FiSearch />,   label: 'Semantic Search', badge: 'AI' },
+  { to: '/logs',        icon: <FiActivity />, label: 'Activity Logs', badge: null },
 ];
 
 const MEMBER_MENU = [
   { to: '/browse',      icon: <FiBook />,     label: 'Browse Books',  badge: null },
   { to: '/my-borrows',  icon: <FiClock />,    label: 'My Borrows',    badge: null },
   { to: '/profile',     icon: <FiUser />,     label: 'My Profile',    badge: null },
+  { to: '/search',      icon: <FiSearch />,   label: 'Semantic Search', badge: 'AI' },
 ];
 
 const ROLE_META = {
@@ -39,8 +48,10 @@ const ROLE_META = {
 
 export default function Sidebar() {
   const { user, logout, isAdmin, isLibrarian } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const isDark = theme === 'dark';
 
   const menuItems = isAdmin()
     ? ADMIN_MENU
@@ -134,6 +145,26 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="sidebar-footer">
         <div className="sidebar-divider" />
+
+        {/* Theme toggle */}
+        <button
+          className={`theme-toggle-btn ${collapsed ? 'collapsed' : ''}`}
+          onClick={toggleTheme}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          id="theme-toggle-btn"
+        >
+          <span className="theme-toggle-track">
+            <span className="theme-toggle-thumb">
+              {isDark ? <FiMoon size={10} /> : <FiSun size={10} />}
+            </span>
+          </span>
+          {!collapsed && (
+            <span className="theme-toggle-label">
+              {isDark ? 'Dark Mode' : 'Light Mode'}
+            </span>
+          )}
+        </button>
+
         <button
           className="nav-link logout-btn"
           onClick={handleLogout}
