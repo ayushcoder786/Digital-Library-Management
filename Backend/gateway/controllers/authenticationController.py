@@ -31,13 +31,19 @@ async def login(U: SigninSchema):
     async with httpx.AsyncClient() as client:
         response = await client.post(
             SPRING_URL + "user/signin",
-            json=U.model_dump())
-    data = response.json()
+            json=U.model_dump()
+        )
 
-    # Sync user to MongoDB (non-blocking, best-effort)
-    user = data.get("user") or {}
-    if user.get("id"):
-        await _sync_user_to_mongo(user, "LOGIN")
+    print("SPRING STATUS:", response.status_code)
+    print("SPRING RESPONSE:", response.text)
+
+    try:
+        data = response.json()
+    except Exception:
+        return {
+            "status": response.status_code,
+            "raw_response": response.text
+        }
 
     return data
 

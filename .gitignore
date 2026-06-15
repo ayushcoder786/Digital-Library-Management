@@ -89,3 +89,4 @@ logs/
 *.log
 .vercel
 .vercel-cli
+.env*
