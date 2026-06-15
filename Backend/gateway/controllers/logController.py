@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Optional
-import httpx
+import httpx, os
 
 router = APIRouter(prefix="/api/logs")
 
-NODE_URL = "http://localhost:8002"
+NODE_URL = os.getenv("NODE_URL", "http://localhost:8002").rstrip("/")
 
 @router.post("")
 async def create_log(body: dict):

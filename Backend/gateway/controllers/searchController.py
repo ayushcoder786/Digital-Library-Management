@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Optional
-import httpx
+import httpx, os
 
 router = APIRouter(prefix="/api/search")
 
-NODE_URL = "http://localhost:8002"
+NODE_URL = os.getenv("NODE_URL", "http://localhost:8002").rstrip("/")
 
 @router.get("")
 async def vector_search(q: str, topK: int = 5):

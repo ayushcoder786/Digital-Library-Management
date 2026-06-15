@@ -1,9 +1,12 @@
 from fastapi import APIRouter
-import httpx
+import httpx, os
 
 router = APIRouter(prefix="/api/borrows")
 
-SPRING_URL = "http://localhost:8081/"
+SPRING_URL = os.getenv(
+    "SPRING_URL",
+    os.getenv("SPRING_BOOT_URL", "http://localhost:8081"),
+).rstrip("/") + "/"
 
 @router.get("")
 async def get_all():

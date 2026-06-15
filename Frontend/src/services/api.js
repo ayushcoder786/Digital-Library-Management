@@ -1,8 +1,14 @@
 import axios from 'axios';
 
 // All requests go through the FastAPI Gateway
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV
+    ? 'http://localhost:8000'
+    : 'https://digital-library-management-gateway.onrender.com');
+
 const API = axios.create({
-  baseURL: 'https://digital-library-management-gateway.onrender.com',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });

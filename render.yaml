@@ -9,23 +9,55 @@
 #   - Frontend is a free static site
 ################################################################################
 
-databases:
-  # ── 1. Managed PostgreSQL ───────────────────────────────────────────────────
-  - name: digital-library-db
-    databaseName: diglib
-    user: dlm_user
+services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. API GATEWAY  (FastAPI / Python)
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: web
+    name: digital-library-management-gateway
+    runtime: python
+    region: singapore          # closest free-tier region to India
     plan: free
+
+    # Path inside your repo that contains requirements.txt and main.py
+    rootDir: Backend/gateway
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      # ── Upstream service URLs (set after the other two services are deployed) ──
+      - key: SPRING_URL
+        value: https://digital-library-management-coreservice.onrender.com
+
+      - key: NODE_URL
+        value: https://digital-library-management-taskservices.onrender.com
+
+      # ── JWT ────────────────────────────────────────────────────────────────
+      - key: JWT_SECRET
+        sync: false   # set manually in Render dashboard — never commit secrets!
+
+      - key: JWT_ALGORITHM
+        value: HS256
+
+      # ── CORS — add your frontend URL after it is deployed ──────────────────
+      - key: FRONTEND_URL
+        value: ""
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. TASK SERVICES  (Node.js / Express / MongoDB)
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: web
+    name: digital-library-management-taskservices
+    runtime: node
     region: singapore
 
 services:
 
   # ── 2. Core Services – Spring Boot (Containerized) ─────────────────────────
   - type: web
-    name: digital-library-coreservices
-    env: docker
-    dockerContext: Backend/coreservices/coreservices
-    dockerfilePath: Backend/coreservices/coreservices/Dockerfile
-    plan: free
+    name: digital-library-management-coreservice
+    runtime: java
     region: singapore
     envVars:
       # PostgreSQL — injected directly from the managed DB

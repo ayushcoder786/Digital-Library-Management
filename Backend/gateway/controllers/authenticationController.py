@@ -4,8 +4,11 @@ import httpx, os
 
 router = APIRouter(prefix="/api/auth")
 
-SPRING_URL = os.getenv("SPRING_URL", "http://localhost:8081/")
-NODE_URL   = os.getenv("NODE_URL",   "http://localhost:8002")
+SPRING_URL = os.getenv(
+    "SPRING_URL",
+    os.getenv("SPRING_BOOT_URL", "http://localhost:8081"),
+).rstrip("/") + "/"
+NODE_URL = os.getenv("NODE_URL", "http://localhost:8002").rstrip("/")
 
 
 async def _sync_user_to_mongo(user: dict, event: str):
