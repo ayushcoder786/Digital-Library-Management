@@ -11,7 +11,7 @@
 	<groupId>mth</groupId>
 	<artifactId>coreservices</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>coreservices</name>
 	<description>Digital Library Management – Core Services (Spring Boot)</description>
 	<url/>
@@ -59,12 +59,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- WAR deployment (embedded Tomcat kept for dev) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
+
 
 		<!-- Test -->
 		<dependency>
