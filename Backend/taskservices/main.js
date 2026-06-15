@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import taskRouter   from './controller/taskControllers.js';
 import logRouter    from './controller/logController.js';
 import searchRouter from './controller/searchController.js';
+import userRouter   from './controller/userController.js';
 
 // ── Database ──────────────────────────────────────────────────────────────────
 import { connectDB } from './config/db.js';
@@ -36,6 +37,7 @@ connectDB();
 app.use("/task",   taskRouter);   // Original task management (kept from template)
 app.use("/logs",   logRouter);    // MongoDB activity logs
 app.use("/search", searchRouter); // Vector / semantic search + book content
+app.use("/users",  userRouter);   // MongoDB user sync (upsert on login/register)
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get("/", async (req, res) => {
@@ -47,6 +49,7 @@ app.get("/", async (req, res) => {
       tasks:  "POST /task/createtask | GET /task/getalltasks/:PAGE/:SIZE | DELETE /task/deletetask/:ID",
       logs:   "POST /logs | GET /logs | GET /logs/recent | GET /logs/stats | GET /logs/user/:userId",
       search: "GET /search?q=<query>&topK=5 | POST /search/content | GET /search/content/:bookId | DELETE /search/content/:bookId",
+      users:  "POST /users/upsert | GET /users | GET /users/:sqlId",
     },
   });
 });

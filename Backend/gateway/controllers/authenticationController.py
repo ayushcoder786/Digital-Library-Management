@@ -1,10 +1,27 @@
 from fastapi import APIRouter, Header
 from models.schemas import SigninSchema, SignupSchema
-import httpx
+import httpx, os
 
 router = APIRouter(prefix="/api/auth")
 
-SPRING_URL = "http://localhost:8081/"
+SPRING_URL = os.getenv("SPRING_URL", "http://localhost:8081/")
+NODE_URL   = os.getenv("NODE_URL",   "http://localhost:8002")
+
+
+async def _sync_user_to_mongo(user: dict, event: str):
+    """
+    Fire-and-forget: push user data to the Node.js / MongoDB service.
+    Errors are silently swallowed so they never break the main login flow.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            await client.post(
+                NODE_URL + "/users/upsert",
+                json={**user, "event": event},
+            )
+    except Exception:
+        pass   # Non-critical — SQL auth already succeeded
+
 
 @router.post("/login")
 async def login(U: SigninSchema):
@@ -12,7 +29,15 @@ async def login(U: SigninSchema):
         response = await client.post(
             SPRING_URL + "user/signin",
             json=U.model_dump())
-    return response.json()
+    data = response.json()
+
+    # Sync user to MongoDB (non-blocking, best-effort)
+    user = data.get("user") or {}
+    if user.get("id"):
+        await _sync_user_to_mongo(user, "LOGIN")
+
+    return data
+
 
 @router.post("/register")
 async def register(U: SignupSchema):
@@ -20,7 +45,15 @@ async def register(U: SignupSchema):
         response = await client.post(
             SPRING_URL + "user/signup",
             json=U.model_dump())
-    return response.json()
+    data = response.json()
+
+    # Sync new user to MongoDB (non-blocking, best-effort)
+    user = data.get("user") or {}
+    if user.get("id"):
+        await _sync_user_to_mongo(user, "REGISTER")
+
+    return data
+
 
 # ── Legacy routes (kept for backward compatibility) ───────────────────────────
 

@@ -5,3 +5,4 @@ from .borrowController     import router as BorrowRouter
 from .categoryController   import router as CategoryRouter
 from .logController        import router as LogRouter
 from .searchController     import router as SearchRouter
+from .mongoUserController  import router as MongoUserRouter

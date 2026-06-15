@@ -25,8 +25,9 @@ app.include_router(BorrowRouter)
 app.include_router(CategoryRouter)
 
 # ── Node.js / MongoDB Routes (NoSQL / unstructured data) ─────────────────────
-app.include_router(LogRouter)     # Activity logs  → /api/logs
-app.include_router(SearchRouter)  # Vector search  → /api/search
+app.include_router(LogRouter)       # Activity logs  → /api/logs
+app.include_router(SearchRouter)    # Vector search  → /api/search
+app.include_router(MongoUserRouter) # MongoDB users  → /api/mongo/users
 
 @app.get("/")
 def home():
