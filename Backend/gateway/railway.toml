@@ -1,0 +1,16 @@
+################################################################################
+# railway.toml — Digital Library Management (Gateway – FastAPI)
+#
+# Place this file inside Backend/gateway/
+# Railway will auto-detect Python and install requirements.txt
+################################################################################
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

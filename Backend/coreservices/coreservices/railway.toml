@@ -1,0 +1,17 @@
+################################################################################
+# railway.toml — Digital Library Management (Core Services – Spring Boot)
+#
+# Place this file inside Backend/coreservices/coreservices/
+# Railway will auto-detect Maven (pom.xml) and build with mvnw
+################################################################################
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "./mvnw clean package -DskipTests"
+
+[deploy]
+startCommand = "java -jar target/coreservices-0.0.1-SNAPSHOT.jar"
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
