@@ -1,131 +1,119 @@
 ################################################################################
 # render.yaml — Digital Library Management – Backend Services
 #
-# Three services are deployed:
-#   1. gateway        → FastAPI (Python)   – API Gateway on port 8000
-#   2. taskservices   → Node.js (Express)  – MongoDB/NoSQL service
-#   3. coreservices   → Spring Boot (Java) – PostgreSQL/SQL service
-#
-# Databases:
-#   • PostgreSQL  → managed by Render (free tier)
-#   • MongoDB     → external Atlas cluster (connection string in env var)
-#
-# IMPORTANT: All secret env vars (marked sync: false) must be set manually
-# in the Render dashboard after the initial deploy.
+# Pattern mirrors friend's Docker-based Blueprint approach:
+#   - All services run as Docker containers (env: docker)
+#   - PostgreSQL is Render-managed (fromDatabase property injection)
+#   - JWT secret is auto-generated and shared across services via fromService
+#   - MongoDB stays on external Atlas (MONGO_URI set manually via sync: false)
+#   - Frontend is a free static site
 ################################################################################
 
-services:
-  # ──────────────────────────────────────────────────────────────────────────
-  # 1. API GATEWAY  (FastAPI / Python)
-  # ──────────────────────────────────────────────────────────────────────────
-  - type: web
-    name: digital-library-gateway
-    runtime: python
-    region: singapore          # closest free-tier region to India
+databases:
+  # ── 1. Managed PostgreSQL ───────────────────────────────────────────────────
+  - name: digital-library-db
+    databaseName: diglib
+    user: dlm_user
     plan: free
-
-    # Path inside your repo that contains requirements.txt and main.py
-    rootDir: Backend/gateway
-
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-
-    envVars:
-      # ── Upstream service URLs (set after the other two services are deployed) ──
-      - key: SPRING_BOOT_URL
-        value: https://digital-library-coreservices.onrender.com   # update after deploy
-
-      - key: NODE_URL
-        value: https://digital-library-taskservices.onrender.com   # update after deploy
-
-      # ── JWT ────────────────────────────────────────────────────────────────
-      - key: JWT_SECRET
-        sync: false   # set manually in Render dashboard — never commit secrets!
-
-      - key: JWT_ALGORITHM
-        value: HS256
-
-      # ── CORS — add your frontend URL after it is deployed ──────────────────
-      - key: FRONTEND_URL
-        value: https://your-frontend.onrender.com   # update after frontend deploy
-
-  # ──────────────────────────────────────────────────────────────────────────
-  # 2. TASK SERVICES  (Node.js / Express / MongoDB)
-  # ──────────────────────────────────────────────────────────────────────────
-  - type: web
-    name: digital-library-taskservices
-    runtime: node
     region: singapore
-    plan: free
 
-    rootDir: Backend/taskservices
+services:
 
-    buildCommand: npm install
-    startCommand: node main.js    # nodemon is dev-only; use node for production
-
-    envVars:
-      # ── MongoDB Atlas ───────────────────────────────────────────────────────
-      - key: DBURL
-        sync: false   # paste your full Atlas connection string in the dashboard
-
-      # ── JWT (must match gateway & Spring Boot) ──────────────────────────────
-      - key: SECRETE_KEY
-        sync: false
-
-      # Render injects PORT automatically; the app already reads process.env.PORT
-
-  # ──────────────────────────────────────────────────────────────────────────
-  # 3. CORE SERVICES  (Spring Boot / Maven / PostgreSQL)
-  # ──────────────────────────────────────────────────────────────────────────
+  # ── 2. Core Services – Spring Boot (Containerized) ─────────────────────────
   - type: web
     name: digital-library-coreservices
-    runtime: java
-    region: singapore
+    env: docker
+    dockerContext: Backend/coreservices/coreservices
+    dockerfilePath: Backend/coreservices/coreservices/Dockerfile
     plan: free
-
-    rootDir: Backend/coreservices/coreservices
-
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/coreservices-0.0.1-SNAPSHOT.jar
-
+    region: singapore
     envVars:
-      # ── PostgreSQL (Render-managed database — see "databases" section below) ─
-      - key: SPRING_DATASOURCE_URL
+      # PostgreSQL — injected directly from the managed DB
+      - key: DB_HOST
         fromDatabase:
-          name: digital-library-postgres
-          property: connectionString
-
-      - key: SPRING_DATASOURCE_USERNAME
+          name: digital-library-db
+          property: host
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
         fromDatabase:
-          name: digital-library-postgres
+          name: digital-library-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: digital-library-db
           property: user
-
-      - key: SPRING_DATASOURCE_PASSWORD
+      - key: DB_PASSWORD
         fromDatabase:
-          name: digital-library-postgres
+          name: digital-library-db
           property: password
-
-      # ── JPA DDL — use "update" on first deploy, then change to "validate" ───
+      # JWT — auto-generated once, shared to other services
+      - key: JWT_SECRET
+        generateValue: true
+      # JPA DDL — "update" creates tables on first deploy
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
 
-      - key: SPRING_JPA_SHOW_SQL
-        value: "false"
-
-      # ── JWT (must match gateway & Node service) ─────────────────────────────
-      - key: JWT_SECRET
-        sync: false
-
-      # ── Server port (Render injects PORT; Spring reads SERVER_PORT) ──────────
-      - key: SERVER_PORT
-        value: "10000"   # Render's default; your app should also honour $PORT
-
-# ──────────────────────────────────────────────────────────────────────────────
-# MANAGED DATABASES
-# ──────────────────────────────────────────────────────────────────────────────
-databases:
-  - name: digital-library-postgres
-    databaseName: digital_library
-    user: dlm_user
-    region: singapore
+  # ── 3. Task Services – Node.js / Express / MongoDB (Containerized) ──────────
+  - type: web
+    name: digital-library-taskservices
+    env: docker
+    dockerContext: Backend/taskservices
+    dockerfilePath: Backend/taskservices/Dockerfile
     plan: free
+    region: singapore
+    envVars:
+      # MongoDB Atlas — paste connection string manually in Render dashboard
+      - key: DBURL
+        sync: false
+      # JWT — pulled from coreservices so all services share the same secret
+      - key: SECRETE_KEY
+        fromService:
+          name: digital-library-coreservices
+          type: web
+          envVarKey: JWT_SECRET
+
+  # ── 4. API Gateway – FastAPI (Containerized) ────────────────────────────────
+  - type: web
+    name: digital-library-gateway
+    env: docker
+    dockerContext: Backend/gateway
+    dockerfilePath: Backend/gateway/Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      # Shared JWT secret from coreservices
+      - key: JWT_SECRET
+        fromService:
+          name: digital-library-coreservices
+          type: web
+          envVarKey: JWT_SECRET
+      - key: JWT_ALGORITHM
+        value: HS256
+      # Internal service URLs — pulled automatically from deployed services
+      - key: SPRING_BOOT_URL
+        fromService:
+          name: digital-library-coreservices
+          type: web
+          property: host
+      - key: NODE_URL
+        fromService:
+          name: digital-library-taskservices
+          type: web
+          property: host
+
+  # ── 5. Frontend – React / Vite (Static Site – FREE) ─────────────────────────
+  - type: web
+    name: digital-library-frontend
+    runtime: static
+    buildCommand: cd Frontend && npm install && npm run build
+    staticPublishPath: Frontend/dist
+    plan: free
+    region: singapore
+    envVars:
+      # API base URL — points to the gateway
+      - key: VITE_API_URL
+        fromService:
+          name: digital-library-gateway
+          type: web
+          property: host
