@@ -2,11 +2,11 @@ spring.application.name=coreservices
 server.port=8081
 
 # ─── PostgreSQL DataSource ───────────────────────────────────────────────────
-# Copy this file to application-local.properties and fill in your real values.
-# application-local.properties is gitignored and will NOT be committed.
-spring.datasource.url=jdbc:postgresql://localhost:5432/diglib
-spring.datasource.username=postgres
-spring.datasource.password=root
+# Copy this file to application.properties and fill in your real values.
+# application.properties is gitignored and will NOT be committed.
+spring.datasource.url=jdbc:postgresql://localhost:5432/YOUR_DB_NAME
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
 
 spring.datasource.driver-class-name=org.postgresql.Driver
 

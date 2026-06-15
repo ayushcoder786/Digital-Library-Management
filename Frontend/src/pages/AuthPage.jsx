@@ -32,7 +32,11 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const res = await authAPI.login(signInForm.username.trim(), signInForm.password);
-      const u = res.data.user;
+      const u = res.data?.user;
+      if (!u || !u.id) {
+        setError('Invalid Credentials. Please check your username and password.');
+        return;
+      }
       // Log LOGIN event to MongoDB (non-blocking)
       logAPI.create({
         userId:   u.id,
@@ -43,7 +47,12 @@ export default function AuthPage() {
       }).catch(() => {});
       login(u);
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      const status = err?.response?.status;
+      if (status === 401 || status === 403 || status === 404) {
+        setError('Invalid Credentials. Please check your username and password.');
+      } else {
+        setError(err.message || 'Invalid Credentials. Please check your username and password.');
+      }
     } finally {
       setLoading(false);
     }

@@ -73,8 +73,9 @@ Thumbs.db
 # ─────────────────────────────────────────────
 # Sensitive / local config (never commit!)
 # ─────────────────────────────────────────────
-# application.properties is tracked so contributors can run the project.
-# Put secrets/local overrides in application-local.properties (kept private).
+# Real config files with DB credentials – NEVER commit these.
+# Use application.properties.example as a safe template for collaborators.
+**/application.properties
 **/application-local.properties
 **/.env
 **/.env.local

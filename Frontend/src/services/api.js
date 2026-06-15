@@ -17,7 +17,13 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   response => response,
   error => {
-    const message = error.response?.data?.detail || error.message || 'An error occurred';
+    const status = error.response?.status;
+    let message;
+    if (status === 401 || status === 403) {
+      message = 'Invalid Credentials. Please check your username and password.';
+    } else {
+      message = error.response?.data?.detail || error.message || 'An error occurred';
+    }
     return Promise.reject(new Error(message));
   }
 );
