@@ -45,6 +45,10 @@ async def login(U: SigninSchema):
             "raw_response": response.text
         }
 
+    user = data.get("user") or {}
+    if user.get("id"):
+        await _sync_user_to_mongo(user, "LOGIN")
+
     return data
 
 
