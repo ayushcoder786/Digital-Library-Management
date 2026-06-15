@@ -28,29 +28,18 @@ async def _sync_user_to_mongo(user: dict, event: str):
 
 @router.post("/login")
 async def login(U: SigninSchema):
+    print("SPRING_URL =", SPRING_URL)
+
     async with httpx.AsyncClient() as client:
         response = await client.post(
             SPRING_URL + "user/signin",
             json=U.model_dump()
         )
 
-    print("SPRING STATUS:", response.status_code)
-    print("SPRING RESPONSE:", response.text)
+    print("SPRING STATUS =", response.status_code)
+    print("SPRING RESPONSE =", response.text)
 
-    try:
-        data = response.json()
-    except Exception:
-        return {
-            "status": response.status_code,
-            "raw_response": response.text
-        }
-
-    user = data.get("user") or {}
-    if user.get("id"):
-        await _sync_user_to_mongo(user, "LOGIN")
-
-    return data
-
+    return {"status": response.status_code}
 
 @router.post("/register")
 async def register(U: SignupSchema):
