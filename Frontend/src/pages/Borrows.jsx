@@ -3,6 +3,38 @@ import './Borrows.css';
 import { FiPlus, FiRotateCcw, FiX, FiAlertCircle } from 'react-icons/fi';
 import { borrowAPI, bookAPI, userAPI } from '../services/api';
 
+const FINE_PER_DAY = 2;
+
+const toLocalDate = value => {
+  if (!value) return null;
+  return new Date(`${value}T00:00:00`);
+};
+
+const getFineAmount = borrow => {
+  const dueDate = toLocalDate(borrow.dueDate);
+  if (!dueDate) return 0;
+
+  if (borrow.status === 'RETURNED') {
+    // If backend saved a non-zero fine, trust it
+    if (Number(borrow.fineAmount) > 0) return Number(borrow.fineAmount);
+    // Otherwise recalculate from actual return date vs due date
+    // (covers old records returned before fine calculation was implemented)
+    const returnDate = toLocalDate(borrow.returnDate);
+    if (!returnDate) return 0;
+    const overdueDays = Math.max(0, Math.floor((returnDate - dueDate) / 86400000));
+    return overdueDays * FINE_PER_DAY;
+  }
+
+  // For active borrows (BORROWED or OVERDUE), estimate from today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const overdueDays = Math.max(0, Math.floor((today - dueDate) / 86400000));
+  return overdueDays * FINE_PER_DAY;
+};
+
+const isOverdue = borrow =>
+  borrow.status !== 'RETURNED' && toLocalDate(borrow.dueDate) < new Date().setHours(0,0,0,0);
+
 export default function Borrows() {
   const [borrows, setBorrows]     = useState([]);
   const [books, setBooks]         = useState([]);
@@ -44,10 +76,20 @@ export default function Borrows() {
   };
 
   const handleReturn = async id => {
-    if (!window.confirm('Confirm return of this book?')) return;
+    const borrow = borrows.find(b => b.id === id);
+    const fine = getFineAmount(borrow);
+    const fineMsg = fine > 0
+      ? `\n\n⚠️ A fine of ₹${fine.toFixed(2)} will be imposed (${Math.round(fine / FINE_PER_DAY)} day(s) overdue × ₹${FINE_PER_DAY}/day).`
+      : '';
+    if (!window.confirm(`Confirm return of "${borrow?.book?.title || 'this book'}"?${fineMsg}`)) return;
     try {
-      await borrowAPI.returnBook(id);
-      showToast('Book returned successfully!');
+      const res = await borrowAPI.returnBook(id);
+      const savedFine = Number(res.data?.fineAmount || 0);
+      if (savedFine > 0) {
+        showToast(`Book returned. Fine imposed: ₹${savedFine.toFixed(2)}`, 'error');
+      } else {
+        showToast('Book returned successfully! No fine.');
+      }
       fetchAll();
     } catch (e) { showToast(e.message, 'error'); }
   };
@@ -140,15 +182,17 @@ export default function Borrows() {
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{b.book?.author}</div>
                     </td>
                     <td>{b.borrowDate}</td>
-                    <td style={{ color: b.status === 'OVERDUE' ? 'var(--danger)' : 'inherit' }}>
+                    <td style={{ color: isOverdue(b) ? 'var(--danger)' : 'inherit' }}>
                       {b.dueDate}
-                      {b.status === 'OVERDUE' && <FiAlertCircle style={{ marginLeft: 4, verticalAlign: 'middle' }} />}
+                      {isOverdue(b) && <FiAlertCircle style={{ marginLeft: 4, verticalAlign: 'middle' }} title="Overdue" />}
                     </td>
                     <td>{b.returnDate || '—'}</td>
                     <td>
-                      {b.fineAmount > 0
-                        ? <span className="badge badge-danger">${b.fineAmount.toFixed(2)}</span>
-                        : <span className="badge badge-success">$0.00</span>}
+                      {getFineAmount(b) > 0
+                        ? <span className="badge badge-danger" title={b.status !== 'RETURNED' ? 'Estimated fine — will be confirmed on return' : 'Fine charged'}>
+                            ₹{getFineAmount(b).toFixed(2)}{b.status !== 'RETURNED' ? ' (est.)' : ''}
+                          </span>
+                        : <span className="badge badge-success">₹0.00</span>}
                     </td>
                     <td>{statusBadge(b.status)}</td>
                     <td>

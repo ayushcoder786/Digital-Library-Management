@@ -3,6 +3,32 @@ import { FiAlertCircle, FiRotateCcw } from 'react-icons/fi';
 import { borrowAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
+const FINE_PER_DAY = 2;
+
+const toLocalDate = value => {
+  if (!value) return null;
+  return new Date(`${value}T00:00:00`);
+};
+
+const getFineAmount = borrow => {
+  if (Number(borrow.fineAmount) > 0) {
+    return Number(borrow.fineAmount);
+  }
+
+  if (borrow.status !== 'OVERDUE') {
+    return 0;
+  }
+
+  const dueDate = toLocalDate(borrow.dueDate);
+  if (!dueDate) return 0;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const overdueDays = Math.max(0, Math.floor((today - dueDate) / 86400000));
+  return overdueDays * FINE_PER_DAY;
+};
+
 export default function MyBorrows() {
   const { user } = useAuth();
   const [borrows, setBorrows]         = useState([]);
@@ -138,8 +164,8 @@ export default function MyBorrows() {
                     </td>
                     <td>{b.returnDate || '—'}</td>
                     <td>
-                      {b.fineAmount > 0
-                        ? <span className="badge badge-danger">₹{b.fineAmount.toFixed(2)}</span>
+                      {getFineAmount(b) > 0
+                        ? <span className="badge badge-danger">₹{getFineAmount(b).toFixed(2)}{b.status !== 'RETURNED' ? ' (est.)' : ''}</span>
                         : <span className="badge badge-success">₹0.00</span>}
                     </td>
                     <td>{statusBadge(b.status)}</td>

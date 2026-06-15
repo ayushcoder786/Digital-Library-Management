@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,8 +86,12 @@ public class BorrowService {
             throw new RuntimeException("Book already returned.");
         }
 
-        record.setReturnDate(LocalDate.now());
+        LocalDate returnDate = LocalDate.now();
+        record.setReturnDate(returnDate);
         record.setStatus("RETURNED");
+
+        long overdueDays = Math.max(0, ChronoUnit.DAYS.between(record.getDueDate(), returnDate));
+        record.setFineAmount(java.math.BigDecimal.valueOf(overdueDays * 2L));
 
         // Increment available copies
         Book book = record.getBook();
